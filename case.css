@@ -42,3 +42,12 @@
 .analysisDisclosure[open]>summary{color:var(--accent)}.analysisDisclosure .clockHero,.analysisDisclosure .episodeDiagram,.analysisDisclosure .observationSection,.analysisDisclosure .trace{margin:0;padding-top:12px;border-top:0}
 .segmentDetails{border-top:1px solid var(--line);margin-top:22px;padding-top:13px}.segmentDetails>summary{font-size:13px;cursor:pointer;color:var(--accent)}.segmentQuote{display:none}.mainfigure{padding-bottom:30px}.momentnav{margin-top:24px}.clockNote{font-size:12px}
 @media(max-width:760px){.loopSteps{grid-template-columns:repeat(2,minmax(0,1fr))}.loopStep{padding:14px}.loopStep:nth-child(2){border-right:0}.loopStep:nth-child(-n+2){border-bottom:1px solid var(--line)}.loopStep::after{display:none}.loopEvidence{display:block;padding:14px}.loopEvidence button{margin-top:10px;padding-left:0!important}.analysisDisclosure>summary span{display:block;float:none;margin:5px 0 0 18px}.agentLoop .sectionlabel{display:block}.agentLoop .sectionlabel span{display:block;max-width:none;text-align:left;margin-top:10px}.hero{padding-top:28px}.hero p{margin-top:14px}}
+
+/* Compact task heading; supporting charts follow the agent example and replay. */
+.hero.compactTitle{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 0;margin:0}
+.hero.compactTitle h1{font:500 28px/1.25 Georgia,serif;letter-spacing:-.4px;max-width:none;margin:0}
+.hero.compactTitle .status{flex-shrink:0;font-size:12px}
+.agentIntro{max-width:850px;font-size:14px;line-height:1.65;color:var(--muted);margin:12px 0 0}
+#timingAnalysis,#segmentAnalysis,#cameraAnalysis{border-top:1px solid var(--line);padding-top:26px;margin-top:26px}
+#traceDisclosure{margin-top:22px}#traceDisclosure .explorerGrid{margin-top:12px}
+@media(max-width:760px){.hero.compactTitle{display:block;padding:22px 0 18px}.hero.compactTitle h1{font-size:24px;letter-spacing:-.2px}.hero.compactTitle .status{margin-top:12px}.mast nav{gap:12px;font-size:11px}.mast .brand{font-size:11px;letter-spacing:.07em}.agentIntro{font-size:14px}.agentLoop h2{font-size:23px}}

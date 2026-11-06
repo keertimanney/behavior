@@ -31,7 +31,7 @@ function renderOrientationZoom(){
     eventPoint(svg,key,xx,yy,text,`${time(r.t)} wall`,{anchor:i===0?'start':i===3?'end':'middle',dy:-58});
   });
   label(svg,940,317,'WALL TIME','chartText','end');
-  el('diagramCaption').textContent=`Zoom of the hero chart, 15:00–15:50 wall time. Frame 1065 (35.5 s of video) persists for ${(interval.end-interval.start).toFixed(1)} s; the four record starts fall on this flat stretch.`;
+  el('diagramCaption').textContent=`Zoom of the timing overview, 15:00–15:50 wall time. Frame 1065 (35.5 s of video) persists for ${(interval.end-interval.start).toFixed(1)} s; the four record starts fall on this flat stretch.`;
 }
 function renderObservationComparison(before,after){
   const root=el('observations');root.replaceChildren();
