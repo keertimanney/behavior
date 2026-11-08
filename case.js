@@ -19,14 +19,14 @@ let active=0,selected=sources.orientation,ready=false,playingMoment=false;
 const video=el('rollout');
 function getURL(){const p=new URLSearchParams();p.set('moment',moments[active].id);p.set('evidence',selected.id);return `#${p}`;}
 function updateURL(push){el('momentLink').href=getURL();if(push)history.pushState(null,'',getURL());}
-function refreshClock(){const frame=Math.min(2788,Math.max(0,Math.floor(video.currentTime*30+.0001)));const interval=intervals[frame];el('videoClock').textContent=time(video.currentTime);el('frameClock').textContent=String(frame);el('wallClock').textContent=interval?`${time(interval.start)}–${time(interval.end)}`:'Unavailable';el('videoSeek').value=String(frame);el('videoSeek').setAttribute('aria-valuetext',`${time(video.currentTime)} video, frame ${frame}`);}
+function refreshClock(){const frame=Math.min(2788,Math.max(0,Math.floor(video.currentTime*30+.0001)));const interval=intervals[frame];el('videoClock').textContent=time(video.currentTime);el('frameClock').textContent=String(frame);el('wallClock').textContent=interval?time(interval.start):'Unavailable';el('wallClock').title=interval?`This frame was on screen from ${time(interval.start)} to ${time(interval.end)} wall time`:'';el('videoSeek').value=String(frame);el('videoSeek').setAttribute('aria-valuetext',`${time(video.currentTime)} video, frame ${frame}`);}
 function selectSource(r,{seek=true,push=true}={}){selected=r;const m=moments[active];el('clipCaption').textContent=r.t<m.start-.01||r.t>m.end?`Inspecting ${time(r.t)} wall, outside the ${m.label.toLowerCase()} segment. Replay segment returns to its start.`:`Segment: ${time(m.startFrame/30)}–${time(m.endFrame/30)} video. Covers ${time(m.start)}–${time(m.end)} wall time.`;el('sourceType').textContent=r.kind==='state'?'EVALUATOR ONLY':r.kind==='summary'?'MODEL SUMMARY · VERBATIM':'RECORDED '+r.kind.toUpperCase();el('sourceTitle').textContent=r.kind==='summary'?(r.excerpt.match(/^\*\*(.*?)\*\*/)?.[1]||'Returned summary'):r.kind==='state'?'Measured grasp and goal state':r.title;
  el('sourceAnchor').textContent=`Wall ${time(r.t)} · video ${time(r.frame/30)} · frame ${r.frame}`;
  let description;if(r.kind==='summary')description=r.excerpt.replace(/^\*\*.*?\*\*\s*/, '');else if(r.kind==='state')description=`Left grasp: ${r.state.left?'poster':'none'}\nRight grasp: ${r.state.right?'poster':'none'}\nAttachment goal: ${r.state.goal===null?'not evaluated':r.state.goal?'satisfied':'unsatisfied'}`;else if(r.kind==='tool')description=r.raw.arguments?.command||`Read ${r.raw.arguments?.path||r.title}`;else description=typeof r.raw.result==='string'?r.raw.result:`${r.title} · ${r.status}`;
  el('sourceSummary').textContent=description;el('sourceRaw').textContent=JSON.stringify(r.raw,null,2);el('fullRecord').href='#sourceDetail';
  document.querySelectorAll('[data-source]').forEach(n=>{const yes=n.dataset.source===r.id;n.classList.toggle('selected',yes);if(n.matches('.evidenceStep, .diagramEvent, .recordRow'))n.setAttribute('aria-pressed',String(yes));});
  document.querySelectorAll('.cursor').forEach(n=>n.style.left=`${r.t/TRACE.duration*100}%`);
- if(seek){video.pause();playingMoment=false;if(ready)video.currentTime=r.frame/30;else{el('videoClock').textContent=time(r.frame/30);el('frameClock').textContent=String(r.frame);const interval=intervals[r.frame];el('wallClock').textContent=interval?`${time(interval.start)}–${time(interval.end)}`:'Unavailable';}}
+ if(seek){video.pause();playingMoment=false;if(ready)video.currentTime=r.frame/30;else{el('videoClock').textContent=time(r.frame/30);el('frameClock').textContent=String(r.frame);const interval=intervals[r.frame];el('wallClock').textContent=interval?time(interval.start):'Unavailable';el('wallClock').title=interval?`This frame was on screen from ${time(interval.start)} to ${time(interval.end)} wall time`:'';}}
  syncDiagramSource(r);
  syncStorySelection(r);
  updateURL(push);
@@ -57,6 +57,9 @@ video.addEventListener('timeupdate',()=>{if(playingMoment&&video.currentTime>=mo
 if(!video.paused&&!playingMoment){const f=Math.floor(video.currentTime*30+.0001),i=moments.findIndex(m=>f>=m.startFrame&&f<m.endFrame);if(i>=0&&i!==active)chooseMoment(i,{push:false,follow:true});}
 refreshClock();});
 video.addEventListener('seeked',refreshClock);
+// Playback speed: slow motion for the short key moments, 2x to skip the long stretches. Persists across chapters.
+el('videoSpeed').addEventListener('change',()=>{video.playbackRate=Number(el('videoSpeed').value);});
+video.addEventListener('ratechange',()=>{el('videoSpeed').value=String(video.playbackRate);});
 function resolveSource(id){if(byId.has(id))return byId.get(id);if(/^state-\d+$/.test(id||'')){const step=Number(id.slice(6));if(TRACE.states.some(s=>s.step===step)){const r=stateRecord(step);byId.set(r.id,r);return r;}}}
 function restore(){const p=new URLSearchParams(location.hash.slice(1));if(location.hash&&!p.has('moment')&&!p.has('event')){if(!el('steps').children.length)chooseMoment(0,{push:false});return;}if(p.has('event')){chooseMoment(0,{push:false});const r=resolveSource(p.get('event'));if(r)inspectRecord(r,{push:false});return;}const i=moments.findIndex(m=>m.id===p.get('moment'));chooseMoment(i<0?0:i,{push:false,source:resolveSource(p.get('evidence'))});}
 window.addEventListener('popstate',restore);window.addEventListener('hashchange',restore);

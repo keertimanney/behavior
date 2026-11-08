@@ -139,3 +139,17 @@ body{background:var(--page)}
 
 /* Narrower reading width: keeps cards, video and charts from stretching on large screens */
 .wrap{max-width:1100px}
+
+/* Playback speed selector */
+.speedControl{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);margin-left:4px}
+.speedControl select{font:inherit;color:var(--ink);background:var(--paper);border:1px solid #8a9a8f;border-radius:4px;padding:5px 8px;cursor:pointer}
+.speedControl select:hover{background:var(--soft)}
+
+/* Less text under the video: the clip caption, frame/wall readouts and "Two clocks" note are hidden
+   (still in the DOM because the scripts write into them). Current video time stays. */
+#scrubberCaption,#clipCaption,.clockNote,.clockDetail{display:none}
+/* Video and wall time sit side by side */
+.clocks>div{display:inline}
+.clocks>div+div::before{content:' · '}
+#wallClock{cursor:help}
+.playcontrols .clocks{margin-left:auto;text-align:right;font-size:14px}
