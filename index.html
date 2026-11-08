@@ -3,6 +3,17 @@
 <header class="mast"><a class="brand" href="index.html">ASTRA / BEHAVIOR</a><small>INSTANCE 310 / ROLLOUT 0</small><nav><a href="#agentLoop">How Astra works</a><a href="#episodeExploration">Explore episode</a><a href="#method">Sources and timing</a></nav></header>
 <section class="hero compactTitle"><h1>Hanging a picture with Astra</h1><span class="status">Evaluator goal satisfied</span></section>
 
+<section id="overview" class="overview" aria-labelledby="overviewTitle">
+<h2 id="overviewTitle" class="overviewTitle">What you’re looking at</h2>
+<p class="overviewLead"><strong>Astra</strong> is an AI agent that controls a simulated home robot by writing short Python programs. Here it was asked to <strong>hang a picture</strong>: pick up a poster and hang it on a nail on the wall. It succeeded.</p>
+<dl class="overviewFacts">
+<div><dt>Result</dt><dd>Goal satisfied, as judged by the <em>evaluator</em>: the simulator’s own scoring check. Astra never sees the evaluator’s readings.</dd></div>
+<div><dt>Video length</dt><dd>1 min 33 s of robot motion</dd></div>
+<div><dt>Real time taken</dt><dd>30 min 17 s, because most of the time went on the model thinking and running code while the simulated robot stood still</dd></div>
+</dl>
+<p class="overviewGuide">Watch the video below, step through its four chapters, then see where the 30 minutes went. This is one rollout of one task, not a measure of how often Astra succeeds.</p>
+</section>
+
 <section id="agentLoop" class="agentLoop" aria-labelledby="agentLoopTitle">
 <div class="sectionlabel"><h2 id="agentLoopTitle">How Astra works</h2><span>Orientation example · select a step</span></div>
 <p class="agentIntro">Astra uses Python tools to compute poses, command the robot, and inspect images and telemetry.</p>
