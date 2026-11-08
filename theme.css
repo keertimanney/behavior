@@ -153,3 +153,34 @@ body{background:var(--page)}
 .clocks>div+div::before{content:' · '}
 #wallClock{cursor:help}
 .playcontrols .clocks{margin-left:auto;text-align:right;font-size:14px}
+
+/* How Astra works: the step source is always visible at a fixed height, so the card never resizes between steps. */
+.loopDisclosure .loopEvidence{height:205px;min-height:0;align-items:flex-start;padding:16px 18px}
+.loopDisclosure .loopEvidence>div{flex:1;height:100%;display:flex;flex-direction:column}
+#loopEvidenceText{flex:1;max-height:none;min-height:0;overflow:auto}
+@media(max-width:760px){.loopDisclosure .loopEvidence{height:auto;display:block}.loopDisclosure .loopEvidence>div{height:190px}}
+
+/* Less clutter in the explorer: counts the page doesn't need to show. */
+#recordCount,.trace .legend{display:none}
+.sourceheader{justify-content:flex-start}
+
+/* Chapter and diagram clutter: links and captions that repeat what the page already shows. */
+.momentlinks,#diagramBody .diagramOverline{display:none}
+#diagramSelection{display:none}
+.commandLink,.attemptRow button{white-space:nowrap}
+/* Chapter 4 diagram: the call bar was dark with dark text. */
+.callSpan{fill:var(--accent);stroke:none}
+.spanLabel{fill:#fff;font-weight:600}
+
+/* Chart events that belong to the selected How Astra works step. */
+.diagramEvent.loopHi .eventDot{fill:var(--accent);stroke:var(--accent)}
+.diagramEvent.loopHi .eventHit{stroke:var(--accent);stroke-opacity:.35}
+.diagramEvent.loopHi .eventLabel{fill:var(--accent)}
+
+/* How Astra works and the chart under it read as one card (same pattern as the chapters). */
+.agentLoop{margin-bottom:0;border-bottom:0;border-radius:12px 12px 0 0;padding-bottom:6px}
+.episodeDiagram{margin-top:0;border-top:1px solid var(--line);border-radius:0 0 12px 12px}
+@media(max-width:760px){.agentLoop{border-radius:10px 10px 0 0}.episodeDiagram{border-radius:0 0 10px 10px}}
+/* no dark focus box after clicking a chart point */
+.diagramEvent{-webkit-tap-highlight-color:transparent}
+.diagramEvent:focus:not(:focus-visible),.diagramEvent:focus:not(:focus-visible) *{outline:none}
