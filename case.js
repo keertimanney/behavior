@@ -32,7 +32,7 @@ function selectSource(r,{seek=true,push=true}={}){selected=r;const m=moments[act
  updateURL(push);
 }
 function observationFigure(r,label){const fig=make('figure');if(r){const a=make('a');a.href=r.images[0];a.target='_blank';a.rel='noreferrer';const img=make('img');img.src=r.images[0];img.alt=`${label}: tool observation returned at wall ${time(r.end)}`;a.append(img);fig.append(a);const caption=make('figcaption');caption.append(make('strong',label),document.createTextNode(`Returned ${time(r.end)} wall · open original image ↗`));fig.append(caption);}else fig.append(make('p','No observation was returned during this segment.'));return fig;}
-function chooseMoment(index,{push=true,source=null}={}){active=index;const m=moments[index];video.pause();playingMoment=false;el('momentLabel').textContent=`0${index+1} / 04 · SEGMENT`;el('momentTitle').textContent=m.title;el('momentQuestion').textContent=m.question;el('interpretation').textContent=m.interpretation;el('clipCaption').textContent=`Segment: ${time(m.startFrame/30)}–${time(m.endFrame/30)} video. Covers ${time(m.start)}–${time(m.end)} wall time.`;
+function chooseMoment(index,{push=true,source=null,follow=false}={}){active=index;const m=moments[index];if(!follow){video.pause();playingMoment=false;}el('momentLabel').textContent=`0${index+1} / 04 · SEGMENT`;el('momentTitle').textContent=m.title;el('momentQuestion').textContent=m.question;el('interpretation').textContent=m.interpretation;el('clipCaption').textContent=`Segment: ${time(m.startFrame/30)}–${time(m.endFrame/30)} video. Covers ${time(m.start)}–${time(m.end)} wall time.`;
  el('steps').replaceChildren();m.steps.forEach(([key,kind,claim],i)=>{const r=sources[key];const b=make('button',undefined,'evidenceStep');b.dataset.source=r.id;b.append(make('span',String(i+1).padStart(2,'0'),'n'));const box=make('span');box.append(make('b',claim),make('small',`${kind} · ${time(r.t)} wall ↗`));b.append(box);b.addEventListener('click',()=>selectSource(r));el('steps').append(b);});
  document.querySelectorAll('.moment').forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));
  document.querySelectorAll('.window').forEach(n=>{n.style.left=`${m.start/TRACE.duration*100}%`;n.style.width=`${(m.end-m.start)/TRACE.duration*100}%`;});
@@ -41,16 +41,21 @@ function chooseMoment(index,{push=true,source=null}={}){active=index;const m=mom
  renderObservationComparison(before,after);
  renderMediaSegment();
  renderEpisodeDiagram(index);
- selectSource(source||sources[m.steps[0][0]],{push});
+ selectSource(source||sources[m.steps[0][0]],{push,seek:!follow});
 }
-moments.forEach((m,i)=>{const b=make('button',undefined,'moment');b.append(make('span',`0${i+1} / ${time(m.start)} WALL`),make('strong',m.label));b.addEventListener('click',()=>chooseMoment(i));el('moments').append(b);});
+const chapterTabs={orientation:'Fixes an upside-down poster',transfer:'Passes the poster to the right hand',alignment:'Retries until the poster lines up with the nail',completion:'Poster attaches and the goal is met'};
+const videoClock=f=>{const s=Math.round(f/30);return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;};
+moments.forEach((m,i)=>{const b=make('button',undefined,'moment');b.append(make('span',`Chapter ${i+1} · ${videoClock(m.startFrame)}`),make('strong',chapterTabs[m.id]||m.label));b.addEventListener('click',()=>chooseMoment(i));el('moments').append(b);});
 for(const [kind,label] of [['model','Model'],['tool','Tools'],['robot','Robot'],['context','Context']]){const row=make('div',undefined,'lane'),track=make('div',undefined,'track');row.dataset.kind=kind;row.append(make('span',label),track);track.append(make('div',undefined,'window'));for(const r of TRACE.records.filter(r=>r.kind===kind||(kind==='model'&&r.kind==='summary'))){const b=make('button',undefined,`traceMark ${kind}`);b.dataset.source=r.id;b.style.left=`${r.t/TRACE.duration*100}%`;b.style.width=`${Math.max(.12,((r.end??TRACE.duration)-r.t)/TRACE.duration*100)}%`;b.title=`${r.kind} · ${time(r.t)} wall`;b.setAttribute('aria-label',`${r.kind} at ${time(r.t)} wall; inspect record`);b.addEventListener('click',()=>{inspectRecord(r);el('selectedSource').scrollIntoView({behavior:'smooth',block:'center'});});track.append(b);}track.append(make('div',undefined,'cursor'));el('traceLanes').append(row);}
 function initializeMedia(){ready=Math.abs(video.duration-2789/30)<.25;if(!ready){el('mediaError').hidden=false;el('mediaError').textContent='Video duration does not match the source. Synchronized playback is disabled.';el('replay').disabled=true;return;}video.controls=false;for(const id of ['videoSeek','togglePlayback','videoFullscreen'])el(id).disabled=false;video.currentTime=selected.frame/30;refreshClock();}
 video.addEventListener('loadedmetadata',initializeMedia);
 if(video.readyState>=1)initializeMedia();
 video.addEventListener('error',()=>{for(const id of ['videoSeek','togglePlayback','videoFullscreen'])el(id).disabled=true;video.controls=true;ready=false;el('mediaError').hidden=false;el('replay').disabled=true;});
 el('replay').addEventListener('click',async()=>{if(!ready)return;video.currentTime=moments[active].startFrame/30;playingMoment=true;try{await video.play();}catch{playingMoment=false;}});
-video.addEventListener('timeupdate',()=>{if(playingMoment&&video.currentTime>=moments[active].endFrame/30){video.pause();video.currentTime=moments[active].endFrame/30;playingMoment=false;}refreshClock();});
+video.addEventListener('timeupdate',()=>{if(playingMoment&&video.currentTime>=moments[active].endFrame/30){video.pause();video.currentTime=moments[active].endFrame/30;playingMoment=false;}
+// Free playback: follow the chapter whose window the playhead is in (between chapters, the last one stays selected).
+if(!video.paused&&!playingMoment){const f=Math.floor(video.currentTime*30+.0001),i=moments.findIndex(m=>f>=m.startFrame&&f<m.endFrame);if(i>=0&&i!==active)chooseMoment(i,{push:false,follow:true});}
+refreshClock();});
 video.addEventListener('seeked',refreshClock);
 function resolveSource(id){if(byId.has(id))return byId.get(id);if(/^state-\d+$/.test(id||'')){const step=Number(id.slice(6));if(TRACE.states.some(s=>s.step===step)){const r=stateRecord(step);byId.set(r.id,r);return r;}}}
 function restore(){const p=new URLSearchParams(location.hash.slice(1));if(location.hash&&!p.has('moment')&&!p.has('event')){if(!el('steps').children.length)chooseMoment(0,{push:false});return;}if(p.has('event')){chooseMoment(0,{push:false});const r=resolveSource(p.get('event'));if(r)inspectRecord(r,{push:false});return;}const i=moments.findIndex(m=>m.id===p.get('moment'));chooseMoment(i<0?0:i,{push:false,source:resolveSource(p.get('evidence'))});}

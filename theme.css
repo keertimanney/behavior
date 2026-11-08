@@ -126,3 +126,16 @@ body{background:var(--page)}
 .analysisDisclosure .analysisDisclosure{background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:0;margin:24px 0 0}
 .analysisDisclosure .analysisDisclosure>summary{font-size:22px}
 .analysisDisclosure .analysisDisclosure[open]>summary{border-bottom:0;margin-bottom:8px}
+
+/* Chapters: heading is the top of the chapters card (tabs and video sit below it) */
+.chaptersHead{background:var(--paper);border:1px solid var(--card-line);border-bottom:0;border-radius:12px 12px 0 0;padding:26px 30px 0;margin:0 0 0;box-shadow:none}
+.chaptersHead h2{font-size:32px;color:var(--head);margin:0}
+.chaptersHead+.momentnav{border-top:0;border-radius:0;padding-top:12px;box-shadow:none}
+@media(max-width:760px){.chaptersHead{padding:20px 16px 0;border-radius:10px 10px 0 0}.chaptersHead+.momentnav{padding-top:10px}}
+
+/* Chapter tabs: align to the top so differing label lengths don't stagger them */
+.momentnav{align-items:start}
+.moment{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;align-self:stretch}
+
+/* Narrower reading width: keeps cards, video and charts from stretching on large screens */
+.wrap{max-width:1100px}
