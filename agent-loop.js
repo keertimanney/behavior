@@ -28,11 +28,15 @@ loopExample.forEach((item,index)=>{
 function revealTarget(target){
   for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
 }
-// Clicking a chart event flips the steps above to match; re-renders keep the highlight.
-document.addEventListener('click',event=>{
+// Selecting a chart event flips the steps above to match; re-renders keep the highlight.
+function syncLoopFromChart(event){
   const node=event.target.closest('#diagramBody .diagramEvent');if(!node)return;
   const step=loopChartKeys.findIndex(keys=>keys.some(k=>sources[k].id===node.dataset.source));
   if(step>=0&&step!==loopSelected)showLoopStep(step);
+}
+document.addEventListener('click',syncLoopFromChart);
+document.addEventListener('keydown',event=>{
+  if(event.key==='Enter'||event.key===' ')syncLoopFromChart(event);
 });
 new MutationObserver(highlightChart).observe(el('diagramBody'),{childList:true});
 // Reveal disclosure ancestors before existing source links scroll into view.
