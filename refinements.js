@@ -62,9 +62,10 @@ function setupMediaControls(){
   seek.addEventListener('input',()=>{if(!ready)return;video.pause();playingMoment=false;video.currentTime=Number(seek.value)/30;refreshClock();});
   el('togglePlayback').addEventListener('click',async()=>{if(!ready)return;if(video.paused){playingMoment=false;try{await video.play();}catch{}}else video.pause();});
   el('videoFullscreen').addEventListener('click',()=>video.requestFullscreen?.());
-  const update=()=>{el('togglePlayback').textContent=video.paused?'▶ Play':'Ⅱ Pause';el('togglePlayback').setAttribute('aria-label',video.paused?'Play episode video':'Pause episode video');};
-  video.addEventListener('play',update);video.addEventListener('pause',update);
+  video.addEventListener('play',updatePlayButton);video.addEventListener('pause',updatePlayButton);
 }
+// A process hold pauses the video element, but for the reader the episode is still playing.
+function updatePlayButton(){const stopped=video.paused&&!(typeof processHolding==='function'&&processHolding());el('togglePlayback').textContent=stopped?'▶ Play':'Ⅱ Pause';el('togglePlayback').setAttribute('aria-label',stopped?'Play episode video':'Pause episode video');}
 function recordPreview(r){
   if(r.kind==='summary')return r.excerpt.replace(/^\*\*.*?\*\*\s*/,'').split('\n').find(s=>s.trim())||'Returned summary';
   if(r.kind==='tool'){

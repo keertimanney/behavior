@@ -31,6 +31,7 @@ function selectSource(r,{seek=true,push=true}={}){selected=r;const m=moments[act
  if(seek){video.pause();playingMoment=false;if(ready)video.currentTime=r.frame/30;else{el('videoClock').textContent=time(r.frame/30);el('frameClock').textContent=String(r.frame);const interval=intervals[r.frame];el('wallClock').textContent=interval?time(interval.start):'Unavailable';el('wallClock').title=interval?`This frame was on screen from ${time(interval.start)} to ${time(interval.end)} wall time`:'';}}
  syncDiagramSource(r);
  syncStorySelection(r);
+ if(typeof syncLoopToSource==='function')syncLoopToSource(r);
  updateURL(push);
 }
 function observationFigure(r,label){const fig=make('figure');if(r){const a=make('a');a.href=r.images[0];a.target='_blank';a.rel='noreferrer';const img=make('img');img.src=r.images[0];img.alt=`${label}: tool observation returned at wall ${time(r.end)}`;a.append(img);fig.append(a);const caption=make('figcaption');caption.append(make('strong',label),document.createTextNode(`Returned ${time(r.end)} wall · open original image ↗`));fig.append(caption);}else fig.append(make('p','No observation was returned during this segment.'));return fig;}
@@ -64,5 +65,5 @@ el('videoSpeed').addEventListener('change',()=>{video.playbackRate=Number(el('vi
 video.addEventListener('ratechange',()=>{el('videoSpeed').value=String(video.playbackRate);});
 function resolveSource(id){if(byId.has(id))return byId.get(id);if(/^state-\d+$/.test(id||'')){const step=Number(id.slice(6));if(TRACE.states.some(s=>s.step===step)){const r=stateRecord(step);byId.set(r.id,r);return r;}}}
 function restore(){const p=new URLSearchParams(location.hash.slice(1));if(location.hash&&!p.has('moment')&&!p.has('event')){if(!el('steps').children.length)chooseMoment(0,{push:false});return;}if(p.has('event')){chooseMoment(0,{push:false});const r=resolveSource(p.get('event'));if(r)inspectRecord(r,{push:false});return;}const i=moments.findIndex(m=>m.id===p.get('moment'));chooseMoment(i<0?0:i,{push:false,source:resolveSource(p.get('evidence'))});}
-window.addEventListener('popstate',restore);window.addEventListener('hashchange',restore);
+window.addEventListener('hashchange',restore);
 setupStory();setupMediaControls();restore();

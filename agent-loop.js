@@ -8,9 +8,11 @@ const loopExample=[
 ];
 // Chart events (by source key) that belong to each step above, so the two sections stay in sync.
 const loopChartKeys=[['orientation'],['ik','ik2'],['correct'],['correct']];
+// The step highlight only extends the current selection (e.g. both IK calls), so the chart never lights
+// up two unrelated records at once.
 function highlightChart(){
-  const ids=new Set(loopChartKeys[loopSelected].map(k=>sources[k].id));
-  document.querySelectorAll('#diagramBody .diagramEvent').forEach(n=>n.classList.toggle('loopHi',ids.has(n.dataset.source)));
+  const ids=new Set(loopChartKeys[loopSelected].map(k=>sources[k].id)),on=ids.has(selected.id);
+  document.querySelectorAll('#diagramBody .diagramEvent').forEach(n=>n.classList.toggle('loopHi',on&&ids.has(n.dataset.source)));
 }
 let loopSelected=0;
 function showLoopStep(index,{select=false}={}){
@@ -28,16 +30,15 @@ loopExample.forEach((item,index)=>{
 function revealTarget(target){
   for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
 }
-// Selecting a chart event flips the steps above to match; re-renders keep the highlight.
-function syncLoopFromChart(event){
-  const node=event.target.closest('#diagramBody .diagramEvent');if(!node)return;
-  const step=loopChartKeys.findIndex(keys=>keys.some(k=>sources[k].id===node.dataset.source));
-  if(step>=0&&step!==loopSelected)showLoopStep(step);
+// Called by selectSource for every selection (chart, evidence list, explorer, back/forward, playback),
+// so the steps above always match the selected record; re-renders keep the highlight.
+function syncLoopToSource(r){
+  if(!loopChartKeys[loopSelected].some(k=>sources[k].id===r.id)){
+    const step=loopChartKeys.findIndex(keys=>keys.some(k=>sources[k].id===r.id));
+    if(step>=0)showLoopStep(step);
+  }
+  highlightChart();
 }
-document.addEventListener('click',syncLoopFromChart);
-document.addEventListener('keydown',event=>{
-  if(event.key==='Enter'||event.key===' ')syncLoopFromChart(event);
-});
 new MutationObserver(highlightChart).observe(el('diagramBody'),{childList:true});
 // Reveal disclosure ancestors before existing source links scroll into view.
 document.addEventListener('click',event=>{
@@ -47,4 +48,4 @@ document.addEventListener('click',event=>{
 },true);
 function revealHashTarget(){const target=document.getElementById(location.hash.slice(1));if(target)revealTarget(target);const params=new URLSearchParams(location.hash.slice(1));if(params.has('evidence')||params.has('event'))revealTarget(el('selectedSource'));}
 window.addEventListener('hashchange',revealHashTarget);
-showLoopStep(0);revealHashTarget();
+showLoopStep(0);syncLoopToSource(selected);revealHashTarget();

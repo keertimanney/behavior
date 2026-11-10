@@ -184,3 +184,51 @@ body{background:var(--page)}
 /* no dark focus box after clicking a chart point */
 .diagramEvent{-webkit-tap-highlight-color:transparent}
 .diagramEvent:focus:not(:focus-visible),.diagramEvent:focus:not(:focus-visible) *{outline:none}
+
+/* Process overlay (process.js): Observe → Think → Code → Act, layered over the rollout video. */
+.processToggle{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-left:4px;cursor:pointer}
+.processToggle input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.procOverlay{position:absolute;inset:0;pointer-events:none;color:#eef3ef;font:13px/1.4 system-ui,sans-serif}
+.procOverlay.off{display:none}
+.procStages{position:absolute;top:10px;right:12px;display:flex;gap:4px;margin:0;padding:0;list-style:none}
+.procStages li{font:600 10px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;padding:5px 7px;border-radius:999px;background:rgba(0,0,0,.55);color:rgba(255,255,255,.55);transition:background .2s,color .2s}
+.procStages li+li::before{content:"→ ";color:rgba(255,255,255,.35)}
+.procStages li.on{color:#fff}
+.procStages li.on[data-stage=observe]{background:#3f4b47}
+.procStages li.on[data-stage=think]{background:#9a6a3c}
+.procStages li.on[data-stage=code]{background:#3f6889}
+.procStages li.on[data-stage=act]{background:#2f7356}
+.procFreeze{position:absolute;left:16px;top:40px;display:none;flex-direction:column;gap:4px;background:rgba(0,0,0,.66);padding:6px 8px;border-radius:4px;min-width:190px}
+.procFreezeTag{font:600 10px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#f0c690}
+.procFreeze strong{font:500 12px ui-monospace,monospace}
+.procFreezeBar{display:block;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden}
+.procFreezeBar::after{content:"";display:block;height:100%;width:var(--p,0%);background:#f0c690}
+.procCard{position:absolute;right:12px;top:42px;max-height:calc(100% - 54px);width:min(46%,320px);display:none;flex-direction:column;gap:8px;overflow:hidden;background:rgba(10,14,13,.84);border:1px solid rgba(255,255,255,.12);border-left:4px solid #6e7d77;border-radius:6px;padding:12px 14px;animation:procIn .25s ease-out}
+.procCard[data-stage=think],.procCard[data-stage=skip]{border-left-color:#c79b67}
+.procCard[data-stage=code]{border-left-color:#7a9dbd}
+.procCard[data-stage=act]{border-left-color:#79ad94}
+.procCard p{margin:0}
+.procCardHead{display:flex;justify-content:space-between;gap:8px;font:600 11px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}
+.procCardHead span{color:rgba(255,255,255,.6);font-weight:400;letter-spacing:0}
+.procCard strong{font-size:15px;line-height:1.3}
+.procCard img{width:100%;max-height:58%;object-fit:contain;border-radius:3px;background:#000}
+.procCard pre{margin:0;font:11.5px/1.45 ui-monospace,monospace;color:#cfe0f0;white-space:pre;overflow:hidden;text-overflow:ellipsis;background:rgba(0,0,0,.35);padding:8px;border-radius:4px}
+.procQuote{font-style:italic}
+.procNote{color:rgba(255,255,255,.65);font-size:12px}
+.procCaption{position:absolute;left:0;right:0;bottom:0;margin:0;padding:22px 16px 10px;background:linear-gradient(transparent,rgba(0,0,0,.72));font-size:13px}
+.procCaption:empty{display:none}
+.procOverlay.holding .procCard,.procOverlay.holding .procFreeze{display:flex}
+.procOverlay.holding .procCaption{display:none}
+@keyframes procIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.procCard{animation:none}.procStages li{transition:none}}
+@media (max-width:640px){
+  .procStages{top:auto;bottom:8px;right:8px;left:8px;justify-content:center}
+  .procStages li{padding:4px 5px;font-size:9px}
+  .procCard{left:8px;right:8px;top:8px;bottom:auto;width:auto;max-height:calc(100% - 48px);padding:8px 10px;gap:5px;font-size:12px}
+  .procCard img{max-height:70px}
+  .procCard strong{font-size:13px}
+  .procCard pre{font-size:10px;padding:6px}
+  .screen:has(.procOverlay.holding) label,.procOverlay.holding .procFreeze{display:none}
+  .procCaption{bottom:30px;padding-top:12px;font-size:12px}
+  .procFreeze{top:36px;left:8px;min-width:0}
+}

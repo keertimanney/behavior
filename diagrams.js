@@ -18,7 +18,7 @@ function line(svg,x1,y1,x2,y2,cls='chartLine') {svg.append(svgNode('line',{x1,y1
 function label(svg,x,y,text,cls='chartText',anchor='start') {svg.append(svgNode('text',{x,y,class:cls,'text-anchor':anchor},text));}
 function eventPoint(svg,key,x,y,title,sub,{anchor='middle',dy=-28}={}) {
   const r=sources[key],g=svgNode('g',{class:'diagramEvent',role:'button',tabindex:0,'data-source':r.id,'aria-pressed':'false','aria-label':`${title}, ${sub}; inspect source`});
-  const width=Math.max(title.length,sub.length)*8+12,left=anchor==='start'?x-8:anchor==='end'?x-width+8:x-width/2,top=Math.min(y-20,y+dy-17),bottom=Math.max(y+20,y+dy+22);
+  const width=Math.max(title.length,sub.length)*7+12,left=anchor==='start'?x-8:anchor==='end'?x-width+8:x-width/2,top=Math.min(y-20,y+dy-17),bottom=Math.max(y+20,y+dy+22);
   g.append(svgNode('rect',{x:left,y:top,width,height:bottom-top,fill:'transparent','pointer-events':'all'}));
   // A generous invisible hit area also keeps keyboard focus visible.
   g.append(svgNode('circle',{cx:x,cy:y,r:19,class:'eventHit'}),svgNode('circle',{cx:x,cy:y,r:5,class:'eventDot'}));
